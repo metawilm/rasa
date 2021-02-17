@@ -99,11 +99,8 @@ def test_read_yaml_string_with_env_var():
     user: ${USER_NAME}
     password: ${PASS}
     """
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(config_with_env_var)
     assert content["user"] == "user" and content["password"] == "pass"
-
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var, replace_env_vars=False)
-    assert content["user"] == "${USER_NAME}" and content["password"] == "${PASS}"
 
 
 def test_read_yaml_string_with_multiple_env_vars_per_line():
@@ -111,7 +108,7 @@ def test_read_yaml_string_with_multiple_env_vars_per_line():
     user: ${USER_NAME} ${PASS}
     password: ${PASS}
     """
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(config_with_env_var)
     assert content["user"] == "user pass" and content["password"] == "pass"
 
 
@@ -120,7 +117,7 @@ def test_read_yaml_string_with_env_var_prefix():
     user: db_${USER_NAME}
     password: db_${PASS}
     """
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var_prefix, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(config_with_env_var_prefix)
     assert content["user"] == "db_user" and content["password"] == "db_pass"
 
 
@@ -129,7 +126,7 @@ def test_read_yaml_string_with_env_var_postfix():
     user: ${USER_NAME}_admin
     password: ${PASS}_admin
     """
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var_postfix, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(config_with_env_var_postfix)
     assert content["user"] == "user_admin" and content["password"] == "pass_admin"
 
 
@@ -138,7 +135,7 @@ def test_read_yaml_string_with_env_var_infix():
     user: db_${USER_NAME}_admin
     password: db_${PASS}_admin
     """
-    content = rasa.shared.utils.io.read_yaml(config_with_env_var_infix, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(config_with_env_var_infix)
     assert content["user"] == "db_user_admin" and content["password"] == "db_pass_admin"
 
 
@@ -148,7 +145,7 @@ def test_read_yaml_string_with_env_var_not_exist():
     password: ${PASSWORD}
     """
     with pytest.raises(ValueError):
-        rasa.shared.utils.io.read_yaml(config_with_env_var_not_exist, replace_env_vars=True)
+        rasa.shared.utils.io.read_yaml(config_with_env_var_not_exist)
 
 
 def test_environment_variable_not_existing():
@@ -161,7 +158,7 @@ def test_environment_variable_dict_without_prefix_and_postfix():
     os.environ["variable"] = "test"
     content = "model: \n  test: ${variable}"
 
-    content = rasa.shared.utils.io.read_yaml(content, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(content)
 
     assert content["model"]["test"] == "test"
 
@@ -170,7 +167,7 @@ def test_environment_variable_in_list():
     os.environ["variable"] = "test"
     content = "model: \n  - value\n  - ${variable}"
 
-    content = rasa.shared.utils.io.read_yaml(content, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(content)
 
     assert content["model"][1] == "test"
 
@@ -179,7 +176,7 @@ def test_environment_variable_dict_with_prefix():
     os.environ["variable"] = "test"
     content = "model: \n  test: dir/${variable}"
 
-    content = rasa.shared.utils.io.read_yaml(content, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(content)
 
     assert content["model"]["test"] == "dir/test"
 
@@ -188,7 +185,7 @@ def test_environment_variable_dict_with_postfix():
     os.environ["variable"] = "test"
     content = "model: \n  test: ${variable}/dir"
 
-    content = rasa.shared.utils.io.read_yaml(content, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(content)
 
     assert content["model"]["test"] == "test/dir"
 
@@ -197,7 +194,7 @@ def test_environment_variable_dict_with_prefix_and_with_postfix():
     os.environ["variable"] = "test"
     content = "model: \n  test: dir/${variable}/dir"
 
-    content = rasa.shared.utils.io.read_yaml(content, replace_env_vars=True)
+    content = rasa.shared.utils.io.read_yaml(content)
 
     assert content["model"]["test"] == "dir/test/dir"
 
