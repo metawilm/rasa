@@ -1,0 +1,43 @@
+[
+  {
+    "text": "does the second one include breakfast?",
+    "entities": [
+      {
+        "start": 9,
+        "end": 19,
+        "value": "2",
+        "entity": "mention"
+      },
+      {
+        "start": 20,
+        "end": 37,
+        "value": "breakfast-included",
+        "entity": "attribute"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "mention",
+        "start": 9,
+        "end": 15,
+        "confidence_entity": 0.5665317177772522,
+        "value": "2",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      },
+      {
+        "entity": "attribute",
+        "start": 20,
+        "end": 37,
+        "confidence_entity": 0.6941060423851013,
+        "value": "breakfast-included",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  }
+]

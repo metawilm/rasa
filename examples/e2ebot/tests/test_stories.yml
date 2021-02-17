@@ -1,0 +1,40 @@
+stories:
+- story: Test 1
+  steps:
+    - user: my name is [joe](name)
+    - bot: hi joe!
+    - user: I am feeling [happy](mood)
+    - bot: I'm glad
+
+- story: Test 2
+  steps:
+    - user: my name is [bob](name)
+    - bot: hi bob!
+    - user: I am feeling [happy](mood)
+    - bot: I'm glad
+
+- story: Test 3
+  steps:
+    - user: my name is [jim](name)
+    - bot: hi jim!
+    - user: I am feeling [happy](mood)
+    - bot: I'm glad
+
+- story: Test 4
+  steps:
+    - user: my name is [bob](name)
+    - bot: hi bob!
+    - user: I am feeling [sad](mood)
+    - bot: oh dear...
+
+- story: Test 5
+  steps:
+    - user: my name is [joe](name)
+    - bot: hi joe!
+    - user: I'm [sad](mood)
+    - bot: oh dear...
+
+- story: Test 6
+  steps:
+    - user: please know me as [ernie](name)
+    - bot: hi ernie!

@@ -1,0 +1,178 @@
+[
+  {
+    "text": "hey",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.31795811653137207
+    }
+  },
+  {
+    "text": "hello",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.35803520679473877
+    }
+  },
+  {
+    "text": "hi",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.22554655373096466
+    }
+  },
+  {
+    "text": "hello there",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.2888026535511017
+    }
+  },
+  {
+    "text": "good evening",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.3106161952018738
+    }
+  },
+  {
+    "text": "moin",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.2992556691169739
+    }
+  },
+  {
+    "text": "let's go",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "tell_name",
+      "confidence": 0.40718838572502136
+    }
+  },
+  {
+    "text": "hey dude",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.3967580795288086
+    }
+  },
+  {
+    "text": "goodevening",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.3953276574611664
+    }
+  },
+  {
+    "text": "good afternoon",
+    "intent": "greet",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.34420686960220337
+    }
+  },
+  {
+    "text": "yes",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.47176387906074524
+    }
+  },
+  {
+    "text": "y",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.3891341984272003
+    }
+  },
+  {
+    "text": "indeed",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.6750565767288208
+    }
+  },
+  {
+    "text": "of course",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.5983029007911682
+    }
+  },
+  {
+    "text": "that sounds good",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_name",
+      "confidence": 0.2900579571723938
+    }
+  },
+  {
+    "text": "correct",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.5519781112670898
+    }
+  },
+  {
+    "text": "yeah",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.8159196972846985
+    }
+  },
+  {
+    "text": "I don't think so",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "tell_name",
+      "confidence": 0.3130985200405121
+    }
+  },
+  {
+    "text": "had better not",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "tell_name",
+      "confidence": 0.5347186326980591
+    }
+  },
+  {
+    "text": "where should I eat tonight?",
+    "intent": "search_restaurant",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.2960938513278961
+    }
+  },
+  {
+    "text": "food",
+    "intent": "search_restaurant",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.31475549936294556
+    }
+  },
+  {
+    "text": "I'm hungry",
+    "intent": "search_restaurant",
+    "intent_prediction": {
+      "name": "tell_mood",
+      "confidence": 0.3443666100502014
+    }
+  }
+]

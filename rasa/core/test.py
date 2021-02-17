@@ -7,7 +7,9 @@ from typing import Any, Dict, List, Optional, Text, Tuple
 
 from rasa import telemetry
 from rasa.core.policies.policy import PolicyPrediction
+from rasa.nlu.test import EntityEvaluationResult, evaluate_entities
 from rasa.shared.exceptions import RasaException
+from rasa.shared.nlu.training_data.message import Message
 import rasa.shared.utils.io
 from rasa.core.channels import UserMessage
 from rasa.shared.core.training_data.story_writer.yaml_story_writer import (
@@ -17,7 +19,7 @@ from rasa.shared.core.domain import Domain
 from rasa.nlu.constants import (
     ENTITY_ATTRIBUTE_TEXT,
     RESPONSE_SELECTOR_DEFAULT_INTENT,
-    RESPONSE_SELECTOR_RETRIEVAL_INTENTS,
+    RESPONSE_SELECTOR_RETRIEVAL_INTENTS, TOKENS_NAMES,
 )
 from rasa.shared.nlu.constants import (
     INTENT,
@@ -31,10 +33,13 @@ from rasa.shared.nlu.constants import (
     INTENT_NAME_KEY,
     RESPONSE,
     RESPONSE_SELECTOR,
-    FULL_RETRIEVAL_INTENT_NAME_KEY,
+    FULL_RETRIEVAL_INTENT_NAME_KEY, TEXT,
 )
 from rasa.constants import RESULTS_FILE, PERCENTAGE_KEY
-from rasa.shared.core.events import ActionExecuted, UserUttered
+from rasa.shared.core.events import (
+    ActionExecuted, DefinePrevUserUtteredFeaturization,
+    EntitiesAdded, UserUttered,
+)
 from rasa.shared.core.trackers import DialogueStateTracker
 from rasa.shared.nlu.training_data.formats.readerwriter import TrainingDataWriter
 from rasa.shared.importers.importer import TrainingDataImporter
@@ -88,6 +93,19 @@ class EvaluationStore:
         self.intent_targets = intent_targets or []
         self.entity_predictions = entity_predictions or []
         self.entity_targets = entity_targets or []
+
+    def __repr__(self):
+        val = ""
+        for name, thing in (
+            ("action_predictions", self.action_predictions),
+            ("action_targets", self.action_targets),
+            ("intent_predictions", self.intent_predictions),
+            ("intent_targets", self.intent_targets),
+            ("entity_predictions", self.entity_predictions),
+            ("entity_targets", self.entity_targets),
+        ):
+            val += f"{name}: {thing}\n"
+        return val
 
     def add_to_store(
         self,
@@ -171,8 +189,8 @@ class EvaluationStore:
         texts = sorted(
             list(
                 set(
-                    [e.get("text") for e in self.entity_targets]
-                    + [e.get("text") for e in self.entity_predictions]
+                    [e.get("text", "") for e in self.entity_targets]
+                    + [e.get("text", "") for e in self.entity_predictions]
                 )
             )
         )
@@ -487,7 +505,7 @@ def _collect_action_executed_predictions(
     event: ActionExecuted,
     fail_on_prediction_errors: bool,
     circuit_breaker_tripped: bool,
-) -> Tuple[EvaluationStore, PolicyPrediction]:
+) -> Tuple[EvaluationStore, PolicyPrediction, Optional[EntityEvaluationResult]]:
     from rasa.core.policies.form_policy import FormPolicy
 
     action_executed_eval_store = EvaluationStore()
@@ -496,12 +514,27 @@ def _collect_action_executed_predictions(
     gold_action_text = event.action_text
     gold = gold_action_name or gold_action_text
 
+    entity_result = None
+
     if circuit_breaker_tripped:
         prediction = PolicyPrediction([], policy_name=None)
         predicted = "circuit breaker tripped"
     else:
         action, prediction = processor.predict_next_action(partial_tracker)
         predicted = action.name()
+        previous_event = partial_tracker.events[-1]
+        # TODO: JUZL: can I just use base class?
+        if isinstance(previous_event, (UserUttered, WronglyClassifiedUserUtterance)):
+            entity_predictions = []
+            for prediction_event in prediction.events:
+                if isinstance(prediction_event, EntitiesAdded):
+                    entity_predictions.extend(prediction_event.entities)
+            message = partial_tracker.latest_message
+            text = message.text
+            entity_targets = message.entities
+            parsed_message = processor.interpreter.featurize_message(Message(data={TEXT: text}))
+            tokens = parsed_message.get(TOKENS_NAMES[TEXT])
+            entity_result = EntityEvaluationResult(entity_targets, entity_predictions, tokens, text)
 
         if (
             prediction.policy_name
@@ -560,7 +593,7 @@ def _collect_action_executed_predictions(
             )
         )
 
-    return action_executed_eval_store, prediction
+    return action_executed_eval_store, prediction, entity_result
 
 
 def _form_might_have_been_rejected(
@@ -577,7 +610,7 @@ async def _predict_tracker_actions(
     agent: "Agent",
     fail_on_prediction_errors: bool = False,
     use_e2e: bool = False,
-) -> Tuple[EvaluationStore, DialogueStateTracker, List[Dict[Text, Any]]]:
+) -> Tuple[EvaluationStore, DialogueStateTracker, List[Dict[Text, Any]], List[EntityEvaluationResult]]:
 
     processor = agent.create_processor()
     tracker_eval_store = EvaluationStore()
@@ -594,19 +627,22 @@ async def _predict_tracker_actions(
     tracker_actions = []
     should_predict_another_action = True
     num_predicted_actions = 0
+    entity_results = []
 
     for event in events[1:]:
         if isinstance(event, ActionExecuted):
             circuit_breaker_tripped = processor.is_action_limit_reached(
                 num_predicted_actions, should_predict_another_action
             )
-            (action_executed_result, prediction) = _collect_action_executed_predictions(
+            (action_executed_result, prediction, entity_result) = _collect_action_executed_predictions(
                 processor,
                 partial_tracker,
                 event,
                 fail_on_prediction_errors,
                 circuit_breaker_tripped,
             )
+            if entity_result:
+                entity_results.append(entity_result)
             tracker_eval_store.merge_store(action_executed_result)
             tracker_actions.append(
                 {
@@ -621,6 +657,7 @@ async def _predict_tracker_actions(
             )
             num_predicted_actions += 1
 
+        # TODO: JUZL: do we need the use_e2e flag now we can have UserUttered in training stories?
         elif use_e2e and isinstance(event, UserUttered):
             # This means that user utterance didn't have a user message, only intent,
             # so we can skip the NLU part and take the parse data directly.
@@ -642,7 +679,7 @@ async def _predict_tracker_actions(
         if isinstance(event, UserUttered):
             num_predicted_actions = 0
 
-    return tracker_eval_store, partial_tracker, tracker_actions
+    return tracker_eval_store, partial_tracker, tracker_actions, entity_results
 
 
 def _in_training_data_fraction(action_list: List[Dict[Text, Any]]) -> float:
@@ -665,7 +702,7 @@ async def _collect_story_predictions(
     agent: "Agent",
     fail_on_prediction_errors: bool = False,
     use_e2e: bool = False,
-) -> Tuple[StoryEvaluation, int]:
+) -> Tuple[StoryEvaluation, int, List[EntityEvaluationResult]]:
     """Test the stories from a file, running them through the stored model."""
     from rasa.test import get_evaluation_metrics
     from tqdm import tqdm
@@ -680,14 +717,19 @@ async def _collect_story_predictions(
 
     action_list = []
 
+    entity_results = []
+
     for tracker in tqdm(completed_trackers):
         (
             tracker_results,
             predicted_tracker,
             tracker_actions,
+            tracker_entity_results,
         ) = await _predict_tracker_actions(
             tracker, agent, fail_on_prediction_errors, use_e2e
         )
+
+        entity_results.extend(tracker_entity_results)
 
         story_eval_store.merge_store(tracker_results)
 
@@ -732,6 +774,7 @@ async def _collect_story_predictions(
             in_training_data_fraction=in_training_data_fraction,
         ),
         number_of_stories,
+        entity_results
     )
 
 
@@ -781,7 +824,7 @@ async def test(
     generator = await _create_data_generator(stories, agent, max_stories, e2e)
     completed_trackers = generator.generate_story_trackers()
 
-    story_evaluation, _ = await _collect_story_predictions(
+    story_evaluation, _, entity_results = await _collect_story_predictions(
         completed_trackers, agent, fail_on_prediction_errors, e2e
     )
 
@@ -802,10 +845,13 @@ async def test(
             report_filename = os.path.join(out_directory, REPORT_STORIES_FILE)
             rasa.shared.utils.io.dump_obj_as_json_to_file(report_filename, report)
             logger.info(f"Stories report saved to {report_filename}.")
+
         else:
             report, precision, f1, accuracy = get_evaluation_metrics(
                 targets, predictions, output_dict=True
             )
+
+    evaluate_entities(entity_results, {'TEDPolicy'}, out_directory, successes, errors, disable_plotting)
 
     telemetry.track_core_model_test(len(generator.story_graph.story_steps), e2e, agent)
 
@@ -955,7 +1001,8 @@ async def _evaluate_core_model(model: Text, stories_file: Text) -> int:
     agent = Agent.load(model)
     generator = await _create_data_generator(stories_file, agent)
     completed_trackers = generator.generate_story_trackers()
-    story_eval_store, number_of_stories = await _collect_story_predictions(
+    # TODO: JUZL:
+    story_eval_store, number_of_stories, _ = await _collect_story_predictions(
         completed_trackers, agent
     )
     failed_stories = story_eval_store.failed_stories

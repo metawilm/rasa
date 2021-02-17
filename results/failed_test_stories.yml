@@ -1,0 +1,17 @@
+version: "2.0"
+stories:
+- story: chitchat name (/var/folders/lz/129s0r495xl9twwk01smpxrw0000gn/T/tmpm_isnddp/0dfbfeaf4c8a4e668aef38a0ead3f2f6_test_base_retrieval_intent_wrong_prediction.yml)
+  steps:
+  - intent: affirm  # predicted: None: What is your name?
+  - action: utter_chitchat  # predicted: action_default_fallback
+  - action: action_listen  # predicted: action_default_fallback
+- story: chitchat name (/var/folders/lz/129s0r495xl9twwk01smpxrw0000gn/T/tmpm_isnddp/15141e77d4cb4d399525308c23f64119_test_base_retrieval_intent_story.yml)
+  steps:
+  - intent: chitchat  # predicted: None: What's the weather like today?
+  - action: utter_chitchat  # predicted: action_default_fallback
+  - action: action_listen  # predicted: action_default_fallback
+- story: chitchat name (/var/folders/lz/129s0r495xl9twwk01smpxrw0000gn/T/tmpm_isnddp/8342ec7075cf4966b2ff42a40ef7d32f_test_full_retrieval_intent_wrong_prediction.yml)
+  steps:
+  - intent: chitchat/ask_weather  # predicted: None: What is your name?
+  - action: utter_chitchat  # predicted: action_default_fallback
+  - action: action_listen  # predicted: action_default_fallback

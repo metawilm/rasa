@@ -36,3 +36,17 @@ stories:
   - action: utter_suggest_cuisine
   - user: "I had that yesterday"
   - action: utter_suggest_cuisine
+
+- story: some story with entity
+  steps:
+  - user: my name is [joe](name)
+  - bot: hi joe!
+  - user: I am feeling [happy](mood)
+  - bot: I'm glad
+
+- story: another story with entity
+  steps:
+  - user: my name is [bob](name)
+  - bot: hi bob!
+  - user: I am feeling [sad](mood)
+  - bot: oh dear...

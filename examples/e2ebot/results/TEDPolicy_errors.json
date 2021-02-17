@@ -1,0 +1,28 @@
+[
+  {
+    "text": "my name is jim",
+    "entities": [
+      {
+        "text": "my name is jim",
+        "start": 11,
+        "end": 14,
+        "entity": "name",
+        "value": "jim"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "please know me as ernie",
+    "entities": [
+      {
+        "text": "please know me as ernie",
+        "start": 18,
+        "end": 23,
+        "entity": "name",
+        "value": "ernie"
+      }
+    ],
+    "predicted_entities": []
+  }
+]

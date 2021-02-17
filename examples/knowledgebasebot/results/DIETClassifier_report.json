@@ -1,0 +1,69 @@
+{
+  "object_type": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 15,
+    "confused_with": {}
+  },
+  "cuisine": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 5,
+    "confused_with": {}
+  },
+  "attribute": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 23,
+    "confused_with": {}
+  },
+  "restaurant": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 7,
+    "confused_with": {}
+  },
+  "hotel": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 4,
+    "confused_with": {}
+  },
+  "city": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1-score": 1.0,
+    "support": 6,
+    "confused_with": {}
+  },
+  "mention": {
+    "precision": 1.0,
+    "recall": 0.9285714285714286,
+    "f1-score": 0.962962962962963,
+    "support": 14,
+    "confused_with": {}
+  },
+  "micro avg": {
+    "precision": 1.0,
+    "recall": 0.9864864864864865,
+    "f1-score": 0.9931972789115647,
+    "support": 74
+  },
+  "macro avg": {
+    "precision": 1.0,
+    "recall": 0.9897959183673469,
+    "f1-score": 0.9947089947089947,
+    "support": 74
+  },
+  "weighted avg": {
+    "precision": 1.0,
+    "recall": 0.9864864864864865,
+    "f1-score": 0.992992992992993,
+    "support": 74
+  }
+}

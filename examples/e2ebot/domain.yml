@@ -6,10 +6,16 @@ actions:
  - utter_search_restaurants
 
 intents:
+ - tell_name
+ - tell_mood
  - greet
  - affirm
  - deny
  - search_restaurant
+
+entities:
+ - name
+ - mood
 
 responses:
   utter_greet:
